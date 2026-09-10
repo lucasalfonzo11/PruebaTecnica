@@ -1,6 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using PruebaTecnica.Domain.Entities;
 using PruebaTecnica.Infrastructure.Persistence;
 using PruebaTecnica.Middleware;
+using FluentValidation;
+using PruebaTecnica.Application.Users.Commands.CreateUser;
+using Microsoft.AspNetCore.Identity;
+using PruebaTecnica.Endpoints;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConection");
@@ -8,10 +13,15 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConecti
 if (string.IsNullOrWhiteSpace(connectionString)){
     throw new InvalidOperationException("DefaultConection configuration is required.");
 }
-builder.Services.AddDbContext<AppDbContext>( options => options.UseSqlite(connectionString));
+
+builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionString));
+builder.Services.AddValidatorsFromAssemblyContaining<CreateUserValidator>();
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddScoped<CreateUserHandler>();
 
 var app = builder.Build();
 
 app.UseMiddleware<ApiKeyMiddleware>();
 app.MapGet("/", () => "Hello World!");
+app.MapUsersEndpoints();
 app.Run();
