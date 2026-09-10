@@ -1,0 +1,18 @@
+# Archivos de compilación
+bin/
+obj/
+
+# Archivos locales del editor
+.vs/
+.vscode/
+*.user
+*.suo
+
+# Registros
+*.log
+
+# Bases de datos locales de SQLite
+*.db
+*.db-shm
+*.db-wal
+*.db-journal
