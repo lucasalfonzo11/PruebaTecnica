@@ -2,6 +2,9 @@ using FluentValidation;
 using PruebaTecnica.Application.Users.Commands.CreateUser;
 using PruebaTecnica.Application.Users.Queries.GetUserById;
 using PruebaTecnica.Application.Users.Queries.GetUsers;
+using PruebaTecnica.Application.Users.Commands.UpdateUser;
+using PruebaTecnica.Domain.Entities;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace PruebaTecnica.Endpoints;
 
@@ -11,6 +14,7 @@ public static class UserEndpoints{
         group.MapPost("", CreateUserAsync);
         group.MapGet("/{id:int}", GetUserByIdAsync);
         group.MapGet("", GetUsersAsync);
+        group.MapPut("/{id:int}", UpdateUserAsync);
     }
 
     private static async Task<IResult> CreateUserAsync(
@@ -47,9 +51,29 @@ public static class UserEndpoints{
         return Results.Ok(user);
     }
 
-    private static async Task<IResult> GetUsersAsync(bool? isActive, GetUsersHandler handler, CancellationToken cancellationToken){
+    private static async Task<IResult> GetUsersAsync(bool? isActive, GetUsersHandler handler, CancellationToken cancellationToken)
+    {
         var query = new GetUsersQuery(isActive);
         var users = await handler.HandleAsync(query, cancellationToken);
         return Results.Ok(users);
+    }
+
+    private static async Task<IResult> UpdateUserAsync(int id,UpdateUserCommand command, IValidator<UpdateUserCommand> validator, UpdateUserHandler handler, CancellationToken cancellationToken){
+        if (id <= 0){
+            return Results.BadRequest(new { error = "User ID must be greater than zero." });
+        }
+
+        var validationResult = await validator.ValidateAsync(command, cancellationToken);
+        if (!validationResult.IsValid){
+            return Results.ValidationProblem(validationResult.ToDictionary());
+        }
+
+        var result = await handler.HandleAsync(id, command, cancellationToken);
+        return result switch{
+            UserUpdated => Results.NoContent(),
+            UserUpdateNotFound => Results.NotFound(new { error = "User not found." }),
+            UserUpdateConflict conflict => Results.Conflict(new { error = conflict.Message }),
+            _=> throw new InvalidOperationException("Unexpected update-user result.")
+        };
     }
 }

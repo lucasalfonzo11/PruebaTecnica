@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using PruebaTecnica.Application.Users.Commands.UpdateUser;
 using PruebaTecnica.Application.Users.Queries.GetUsers;
 using PruebaTecnica.Domain.Entities;
 using PruebaTecnica.Infrastructure.Persistence;
@@ -22,6 +23,7 @@ builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<CreateUserHandler>();
 builder.Services.AddScoped<GetUserByIdHandler>();
 builder.Services.AddScoped<GetUsersHandler>();
+builder.Services.AddScoped<UpdateUserHandler>();
 
 var app = builder.Build();
 
