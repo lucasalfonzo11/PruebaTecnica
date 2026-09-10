@@ -1,6 +1,7 @@
 using FluentValidation;
 using PruebaTecnica.Application.Users.Commands.CreateUser;
 using PruebaTecnica.Application.Users.Queries.GetUserById;
+using PruebaTecnica.Application.Users.Queries.GetUsers;
 
 namespace PruebaTecnica.Endpoints;
 
@@ -8,7 +9,8 @@ public static class UserEndpoints{
     public static void MapUsersEndpoints(this IEndpointRouteBuilder endpoints){
         var group = endpoints.MapGroup("/users");
         group.MapPost("", CreateUserAsync);
-        group.MapGet("/{id:int}",GetUserByIdAsync);
+        group.MapGet("/{id:int}", GetUserByIdAsync);
+        group.MapGet("", GetUsersAsync);
     }
 
     private static async Task<IResult> CreateUserAsync(
@@ -43,5 +45,11 @@ public static class UserEndpoints{
         }
 
         return Results.Ok(user);
+    }
+
+    private static async Task<IResult> GetUsersAsync(bool? isActive, GetUsersHandler handler, CancellationToken cancellationToken){
+        var query = new GetUsersQuery(isActive);
+        var users = await handler.HandleAsync(query, cancellationToken);
+        return Results.Ok(users);
     }
 }

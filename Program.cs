@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using PruebaTecnica.Application.Users.Queries.GetUsers;
 using PruebaTecnica.Domain.Entities;
 using PruebaTecnica.Infrastructure.Persistence;
 using PruebaTecnica.Middleware;
@@ -20,6 +21,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<CreateUserValidator>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<CreateUserHandler>();
 builder.Services.AddScoped<GetUserByIdHandler>();
+builder.Services.AddScoped<GetUsersHandler>();
 
 var app = builder.Build();
 
