@@ -1,14 +1,15 @@
 using Microsoft.EntityFrameworkCore;
-using PruebaTecnica.Application.Users.Commands.UpdateUser;
-using PruebaTecnica.Application.Users.Queries.GetUsers;
-using PruebaTecnica.Domain.Entities;
-using PruebaTecnica.Infrastructure.Persistence;
-using PruebaTecnica.Middleware;
 using FluentValidation;
-using PruebaTecnica.Application.Users.Commands.CreateUser;
 using Microsoft.AspNetCore.Identity;
 using PruebaTecnica.Endpoints;
+using PruebaTecnica.Middleware;
+using PruebaTecnica.Domain.Entities;
+using PruebaTecnica.Infrastructure.Persistence;
+using PruebaTecnica.Application.Users.Queries.GetUsers;
+using PruebaTecnica.Application.Users.Commands.UpdateUser;
+using PruebaTecnica.Application.Users.Commands.CreateUser;
 using PruebaTecnica.Application.Users.Queries.GetUserById;
+using PruebaTecnica.Application.Users.Commands.DeleteUser;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConection");
@@ -24,6 +25,7 @@ builder.Services.AddScoped<CreateUserHandler>();
 builder.Services.AddScoped<GetUserByIdHandler>();
 builder.Services.AddScoped<GetUsersHandler>();
 builder.Services.AddScoped<UpdateUserHandler>();
+builder.Services.AddScoped<DeleteUserHandler>();
 
 var app = builder.Build();
 

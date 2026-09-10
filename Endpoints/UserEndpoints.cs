@@ -3,8 +3,7 @@ using PruebaTecnica.Application.Users.Commands.CreateUser;
 using PruebaTecnica.Application.Users.Queries.GetUserById;
 using PruebaTecnica.Application.Users.Queries.GetUsers;
 using PruebaTecnica.Application.Users.Commands.UpdateUser;
-using PruebaTecnica.Domain.Entities;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using PruebaTecnica.Application.Users.Commands.DeleteUser;
 
 namespace PruebaTecnica.Endpoints;
 
@@ -15,6 +14,7 @@ public static class UserEndpoints{
         group.MapGet("/{id:int}", GetUserByIdAsync);
         group.MapGet("", GetUsersAsync);
         group.MapPut("/{id:int}", UpdateUserAsync);
+        group.MapDelete("/{id:int}", DeleteUserAsync);
     }
 
     private static async Task<IResult> CreateUserAsync(
@@ -74,6 +74,19 @@ public static class UserEndpoints{
             UserUpdateNotFound => Results.NotFound(new { error = "User not found." }),
             UserUpdateConflict conflict => Results.Conflict(new { error = conflict.Message }),
             _=> throw new InvalidOperationException("Unexpected update-user result.")
+        };
+    }
+
+    private static async Task<IResult> DeleteUserAsync(int id, DeleteUserHandler handler, CancellationToken cancellationToken){
+        if( id <= 0){
+            return Results.BadRequest(new { error = "User ID must be greater than zero." });
+        }
+        var result = await handler.HandleAsync(new DeleteUserCommand(id), cancellationToken);
+        return result switch
+        {
+            DeleteUserResult.Deleted => Results.NoContent(),
+            DeleteUserResult.NotFound => Results.NotFound(new { error = "User not found." }),
+            _ => throw new InvalidOperationException("Unexpected delete-user result.")
         };
     }
 }

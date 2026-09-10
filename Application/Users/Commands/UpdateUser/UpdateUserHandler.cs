@@ -2,7 +2,6 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using PruebaTecnica.Domain.Entities;
 using PruebaTecnica.Infrastructure.Persistence;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace PruebaTecnica.Application.Users.Commands.UpdateUser;
 
