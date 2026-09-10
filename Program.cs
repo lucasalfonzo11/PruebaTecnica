@@ -6,6 +6,7 @@ using FluentValidation;
 using PruebaTecnica.Application.Users.Commands.CreateUser;
 using Microsoft.AspNetCore.Identity;
 using PruebaTecnica.Endpoints;
+using PruebaTecnica.Application.Users.Queries.GetUserById;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConection");
@@ -18,6 +19,7 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(connect
 builder.Services.AddValidatorsFromAssemblyContaining<CreateUserValidator>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<CreateUserHandler>();
+builder.Services.AddScoped<GetUserByIdHandler>();
 
 var app = builder.Build();
 

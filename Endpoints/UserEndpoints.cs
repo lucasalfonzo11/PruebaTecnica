@@ -1,5 +1,6 @@
 using FluentValidation;
 using PruebaTecnica.Application.Users.Commands.CreateUser;
+using PruebaTecnica.Application.Users.Queries.GetUserById;
 
 namespace PruebaTecnica.Endpoints;
 
@@ -7,6 +8,7 @@ public static class UserEndpoints{
     public static void MapUsersEndpoints(this IEndpointRouteBuilder endpoints){
         var group = endpoints.MapGroup("/users");
         group.MapPost("", CreateUserAsync);
+        group.MapGet("/{id:int}",GetUserByIdAsync);
     }
 
     private static async Task<IResult> CreateUserAsync(
@@ -26,5 +28,20 @@ public static class UserEndpoints{
             UserCreationConflict conflict => Results.Conflict(new { error = conflict.Message }),
             _ => throw new InvalidOperationException("Unexpected create-user result.")
         };
+    }
+
+    private static async Task<IResult> GetUserByIdAsync(int id, GetUserByIdHandler handler, CancellationToken cancellationToken){
+        if (id <= 0){
+            return Results.BadRequest(new { error = "User ID must be greater than zero." });
+        }
+
+        var query = new GetUserByIdQuery(id);
+
+        var user = await handler.HandleAsync(query, cancellationToken);
+        if (user is null){
+            return Results.NotFound(new { error = "User not found." });
+        }
+
+        return Results.Ok(user);
     }
 }
