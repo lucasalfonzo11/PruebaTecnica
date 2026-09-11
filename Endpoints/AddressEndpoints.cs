@@ -1,0 +1,36 @@
+using FluentValidation;
+using PruebaTecnica.Application.Addresses.Commands.CreateAddress;
+
+namespace PruebaTecnica.Endpoints;
+
+public static class AddressEndpoints{
+    public static void MapAddressEndpoints(this IEndpointRouteBuilder endpoints){
+        endpoints.MapPost(
+            "/users/{userId:int}/addresses",
+            CreateAddressAsync);
+    }
+
+    private static async Task<IResult> CreateAddressAsync(
+        int userId,
+        CreateAddressCommand command,
+        IValidator<CreateAddressCommand> validator,
+        CreateAddressHandler handler,
+        CancellationToken cancellationToken){
+        if (userId <= 0){
+            return Results.BadRequest(new{ error = "User ID must be greater than zero."});
+        }
+
+        var validationResult = await validator.ValidateAsync(command, cancellationToken);
+        if (!validationResult.IsValid){
+            return Results.ValidationProblem(validationResult.ToDictionary());
+        }
+
+        var result = await handler.HandleAsync(userId, command, cancellationToken);
+
+        return result switch{
+            AddressCreated created => Results.Json( new { id = created.Id, userId }, statusCode: StatusCodes.Status201Created),
+            AddressUserNotFound => Results.NotFound(new{ error = "User not found."}),
+            _ => throw new InvalidOperationException( "Unexpected create-address result.")
+        };
+    }
+}
