@@ -1,5 +1,6 @@
 using FluentValidation;
 using PruebaTecnica.Application.Addresses.Commands.CreateAddress;
+using PruebaTecnica.Application.Addresses.Commands.UpdateAddress;
 using PruebaTecnica.Application.Addresses.Queries.GetUserAddresses;
 
 namespace PruebaTecnica.Endpoints;
@@ -8,6 +9,7 @@ public static class AddressEndpoints{
     public static void MapAddressEndpoints(this IEndpointRouteBuilder endpoints){
         endpoints.MapPost("/users/{userId:int}/addresses", CreateAddressAsync);
         endpoints.MapGet("/users/{userId:int}/addresses", GetUserAddressesAsync);
+        endpoints.MapPut("/addresses/{id:int}", UpdateAddressAsync);
     }
 
     private static async Task<IResult> CreateAddressAsync(
@@ -47,5 +49,29 @@ public static class AddressEndpoints{
             return Results.NotFound(new{error = "User not found."});
         }
         return Results.Ok(addresses);
+    }
+
+    private static async Task<IResult> UpdateAddressAsync(
+        int id,
+        UpdateAddressCommand command,
+        IValidator<UpdateAddressCommand> validator,
+        UpdateAddressHandler handler,
+        CancellationToken cancellationToken
+    ){
+        if (id <= 0){
+            return Results.BadRequest(new{error = "Address ID must be greater than zero."});
+        }
+
+        var validationResult = await validator.ValidateAsync(command, cancellationToken);
+        if (!validationResult.IsValid){
+            return Results.ValidationProblem(validationResult.ToDictionary());
+        }
+
+        var result = await handler.HandleAsync(id, command, cancellationToken);
+        return result switch{
+            UpdateAddressResult.Updated => Results.NoContent(),
+            UpdateAddressResult.NotFound => Results.NotFound(new{error = "Address not found."}),
+            _ => throw new InvalidOperationException("Unexpected update-address result.")
+        };
     }
 }

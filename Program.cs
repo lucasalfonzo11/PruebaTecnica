@@ -2,12 +2,13 @@ using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PruebaTecnica.Application.Addresses.Commands.CreateAddress;
+using PruebaTecnica.Application.Addresses.Queries.GetUserAddresses;
+using PruebaTecnica.Application.Addresses.Commands.UpdateAddress;
 using PruebaTecnica.Application.Users.Commands.CreateUser;
 using PruebaTecnica.Application.Users.Commands.DeleteUser;
 using PruebaTecnica.Application.Users.Commands.UpdateUser;
 using PruebaTecnica.Application.Users.Queries.GetUserById;
 using PruebaTecnica.Application.Users.Queries.GetUsers;
-using PruebaTecnica.Application.Addresses.Queries.GetUserAddresses;
 using PruebaTecnica.Domain.Entities;
 using PruebaTecnica.Endpoints;
 using PruebaTecnica.Infrastructure.Persistence;
@@ -30,6 +31,7 @@ builder.Services.AddScoped<UpdateUserHandler>();
 builder.Services.AddScoped<DeleteUserHandler>();
 builder.Services.AddScoped<CreateAddressHandler>();
 builder.Services.AddScoped<GetUserAddressesHandler>();
+builder.Services.AddScoped<UpdateAddressHandler>();
 
 var app = builder.Build();
 
