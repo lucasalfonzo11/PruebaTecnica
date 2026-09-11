@@ -7,6 +7,7 @@ using PruebaTecnica.Application.Users.Commands.DeleteUser;
 using PruebaTecnica.Application.Users.Commands.UpdateUser;
 using PruebaTecnica.Application.Users.Queries.GetUserById;
 using PruebaTecnica.Application.Users.Queries.GetUsers;
+using PruebaTecnica.Application.Addresses.Queries.GetUserAddresses;
 using PruebaTecnica.Domain.Entities;
 using PruebaTecnica.Endpoints;
 using PruebaTecnica.Infrastructure.Persistence;
@@ -28,6 +29,7 @@ builder.Services.AddScoped<GetUsersHandler>();
 builder.Services.AddScoped<UpdateUserHandler>();
 builder.Services.AddScoped<DeleteUserHandler>();
 builder.Services.AddScoped<CreateAddressHandler>();
+builder.Services.AddScoped<GetUserAddressesHandler>();
 
 var app = builder.Build();
 
