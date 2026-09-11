@@ -6,6 +6,7 @@ using PruebaTecnica.Application.Addresses.Queries.GetUserAddresses;
 using PruebaTecnica.Application.Addresses.Commands.UpdateAddress;
 using PruebaTecnica.Application.Currencies.Commands.CreateCurrency;
 using PruebaTecnica.Application.Currencies.Queries.GetCurrencies;
+using PruebaTecnica.Application.CurrencyConversion;
 using PruebaTecnica.Application.Users.Commands.CreateUser;
 using PruebaTecnica.Application.Users.Commands.DeleteUser;
 using PruebaTecnica.Application.Users.Commands.UpdateUser;
@@ -38,6 +39,7 @@ builder.Services.AddScoped<UpdateAddressHandler>();
 builder.Services.AddScoped<DeleteAddressHandler>();
 builder.Services.AddScoped<CreateCurrencyHandler>();
 builder.Services.AddScoped<GetCurrenciesHandler>();
+builder.Services.AddScoped<ConvertCurrencyHandler>();
 
 var app = builder.Build();
 
@@ -46,4 +48,5 @@ app.MapGet("/", () => "Hello World!");
 app.MapUsersEndpoints();
 app.MapAddressEndpoints();
 app.MapCurrencyEndpoints();
+app.MapCurrencyConversionEndpoints();
 app.Run();
