@@ -1,13 +1,16 @@
 using FluentValidation;
 using PruebaTecnica.Application.Currencies.Commands.CreateCurrency;
-
+using PruebaTecnica.Application.Currencies.Queries.GetCurrencies;
+using PruebaTecnica.Application.Currencies;
 namespace PruebaTecnica.Endpoints;
+
 
 public static class CurrencyEndpoints{
     public static void MapCurrencyEndpoints(this IEndpointRouteBuilder endpoints)
     {
         var group = endpoints.MapGroup("/currencies");
         group.MapPost("", CreateCurrencyAsync);
+        group.MapGet("", GetCurrenciesAsync);
     }
 
     private static async Task<IResult> CreateCurrencyAsync(
@@ -21,7 +24,7 @@ public static class CurrencyEndpoints{
             return Results.ValidationProblem(validationResult.ToDictionary());
         }
 
-        var result = await handler.HandleAsync(command, cancellationToken);
+        CreateCurrencyResult? result = await handler.HandleAsync(command, cancellationToken);
         return result switch
         {
             CurrencyCreated created => Results.Json(
@@ -31,5 +34,13 @@ public static class CurrencyEndpoints{
             CurrencyCreationConflict conflict => Results.Conflict(new { error = conflict.Message }),
             _ => throw new InvalidOperationException("Unexpected create-currency result.")
         };
+    }
+
+    private static async Task<IResult> GetCurrenciesAsync(
+        GetCurrenciesHandler handler,
+        CancellationToken cancellationToken
+    ){
+        List<CurrencyResponse>? currencies = await handler.HandleAsync(new GetCurrenciesQuery(), cancellationToken);
+        return Results.Ok(currencies);
     }
 }
