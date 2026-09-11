@@ -1,6 +1,7 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi;
 using PruebaTecnica.Application.Addresses.Commands.CreateAddress;
 using PruebaTecnica.Application.Addresses.Queries.GetUserAddresses;
 using PruebaTecnica.Application.Addresses.Commands.UpdateAddress;
@@ -41,7 +42,33 @@ builder.Services.AddScoped<CreateCurrencyHandler>();
 builder.Services.AddScoped<GetCurrenciesHandler>();
 builder.Services.AddScoped<ConvertCurrencyHandler>();
 
+builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddSwaggerGen(options =>{
+    options.SwaggerDoc("v1", new OpenApiInfo{
+        Title = "Prueba Tecnica API",
+        Version = "v1"
+    });
+
+    options.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme{
+        Name = "X-API-KEY",
+        Type = SecuritySchemeType.ApiKey,
+        In = ParameterLocation.Header,
+        Description = "Enter the API key."
+    });
+
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement{
+        [new OpenApiSecuritySchemeReference("ApiKey", document)] = []
+    });
+});
+
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(options => options.RoutePrefix = "swagger");
+}
 
 app.UseMiddleware<ApiKeyMiddleware>();
 app.MapGet("/", () => "Hello World!");
