@@ -13,6 +13,7 @@ using PruebaTecnica.Domain.Entities;
 using PruebaTecnica.Endpoints;
 using PruebaTecnica.Infrastructure.Persistence;
 using PruebaTecnica.Middleware;
+using PruebaTecnica.Application.Addresses.Commands.DeleteAddress;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConection");
@@ -32,6 +33,7 @@ builder.Services.AddScoped<DeleteUserHandler>();
 builder.Services.AddScoped<CreateAddressHandler>();
 builder.Services.AddScoped<GetUserAddressesHandler>();
 builder.Services.AddScoped<UpdateAddressHandler>();
+builder.Services.AddScoped<DeleteAddressHandler>();
 
 var app = builder.Build();
 

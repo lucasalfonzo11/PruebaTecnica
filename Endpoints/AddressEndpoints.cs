@@ -1,6 +1,7 @@
 using FluentValidation;
 using PruebaTecnica.Application.Addresses.Commands.CreateAddress;
 using PruebaTecnica.Application.Addresses.Commands.UpdateAddress;
+using PruebaTecnica.Application.Addresses.Commands.DeleteAddress;
 using PruebaTecnica.Application.Addresses.Queries.GetUserAddresses;
 
 namespace PruebaTecnica.Endpoints;
@@ -10,6 +11,7 @@ public static class AddressEndpoints{
         endpoints.MapPost("/users/{userId:int}/addresses", CreateAddressAsync);
         endpoints.MapGet("/users/{userId:int}/addresses", GetUserAddressesAsync);
         endpoints.MapPut("/addresses/{id:int}", UpdateAddressAsync);
+        endpoints.MapDelete("/addresses/{id:int}",DeleteAddressAsync);
     }
 
     private static async Task<IResult> CreateAddressAsync(
@@ -72,6 +74,19 @@ public static class AddressEndpoints{
             UpdateAddressResult.Updated => Results.NoContent(),
             UpdateAddressResult.NotFound => Results.NotFound(new{error = "Address not found."}),
             _ => throw new InvalidOperationException("Unexpected update-address result.")
+        };
+    }
+
+    private static async Task<IResult> DeleteAddressAsync(int id, DeleteAddressHandler handler, CancellationToken cancellationToken){
+        if(id <= 0){
+            return Results.BadRequest(new { error = "Address ID must be greater than zero." });
+        }
+
+        var result = await handler.HandleAsync(new DeleteAddressCommand(id), cancellationToken);
+        return result switch{
+            DeleteAddressResult.Deleted => Results.NoContent(),
+            DeleteAddressResult.NotFound => Results.NotFound( new {error="Address not found."}),
+            _ => throw new InvalidOperationException("Unexpected delete-address result.")
         };
     }
 }
